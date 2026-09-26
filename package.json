@@ -1,0 +1,18 @@
+{
+  "name": "burguersync-ourinhos",
+  "version": "2.5.5",
+  "description": "Plataforma de autoatendimento e controle de pedidos para hamburguerias artesanais com KDS realtime",
+  "type": "module",
+  "scripts": {
+    "start": "node execution/server.js",
+    "validate": "node execution/validate-env.js",
+    "test": "node execution/test-runner.js",
+    "publish:github": "node execution/publish-github.js"
+  },
+  "dependencies": {
+    "firebase": "^12.19.0"
+  },
+  "devDependencies": {
+    "serve-handler": "^6.1.6"
+  }
+}

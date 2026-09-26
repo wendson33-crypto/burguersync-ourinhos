@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BurguerSync Ourinhos · Hamburgueria Artesanal & KDS Realtime</title>
+  
+  <!-- SEO Tags -->
+  <meta name="description" content="BurguerSync Ourinhos - Plataforma de autoatendimento e exibição de cozinha em tempo real com hambúrgueres artesanais na brasa.">
+  <meta name="keywords" content="hamburgueria, ourinhos, smash burger, delivery, kds realtime, firebase">
+  <meta name="theme-color" content="#0A0A0C">
+  
+  <!-- Fontes do Google -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  
+  <link rel="stylesheet" href="style.css">
+</head>
+<body class="dark-theme">
+
+  <!-- ==================== CABEÇALHO PRINCIPAL ==================== -->
+  <header class="app-header">
+    <div class="header-container">
+      <div class="logo-wrapper" onclick="location.reload()" title="Recarregar BurguerSync">
+        <span class="logo-icon">🍔</span>
+        <h1 class="logo-title">BurguerSync <span class="badge-city">Ourinhos</span></h1>
+      </div>
+      <nav class="mode-selector" aria-label="Seleção de Painel">
+        <button id="btnModoCliente" class="btn-tab active" type="button">🛍️ Cardápio</button>
+        <button id="btnModoCozinha" class="btn-tab" type="button">👨‍🍳 Cozinha <span id="contadorPedidosCozinha" class="badge-count">0</span></button>
+      </nav>
+    </div>
+  </header>
+
+  <!-- ==================== CONTEÚDO PRINCIPAL ==================== -->
+  <main class="main-layout">
+
+    <!-- ==================== 1. VISÃO DO CLIENTE ==================== -->
+    <section id="visaoCliente" class="view-section active">
+      <div class="client-grid">
+        
+        <!-- Vitrine de Produtos -->
+        <div class="catalog-column">
+          <header class="section-heading">
+            <h2>Cardápio Artesanal</h2>
+            <p class="subtitle">Feitos na brasa, ingredientes selecionados e entregues na temperatura ideal.</p>
+          </header>
+
+          <!-- Categorias Rápidas -->
+          <nav class="category-pills" aria-label="Filtro de Categorias">
+            <button class="cat-btn active" data-cat="todos" type="button">🔥 Todos</button>
+            <button class="cat-btn" data-cat="smash" type="button">🍔 Smash & Blends</button>
+            <button class="cat-btn" data-cat="porcoes" type="button">🍟 Porções</button>
+            <button class="cat-btn" data-cat="bebidas" type="button">🥤 Bebidas</button>
+          </nav>
+
+          <!-- Grid dos Lanches -->
+          <div id="gradeLanches" class="products-grid">
+            <!-- Renderizado dinamicamente via JS -->
+          </div>
+        </div>
+
+        <!-- Coluna Lateral: Carrinho & Checkout -->
+        <aside class="order-sidebar">
+          <section id="carrinho" class="checkout-panel">
+            <h2 class="panel-title">
+              <span>Seu Pedido</span>
+              <small id="itensCountBadge">(0 itens)</small>
+            </h2>
+            
+            <ul id="listaItensCarrinho" class="cart-items-list">
+              <!-- Itens injetados via JS -->
+            </ul>
+
+            <!-- Resumo Financeiro -->
+            <div class="price-summary">
+              <div class="summary-line">
+                <span>Subtotal</span>
+                <span id="subtotalPedido">R$ 0,00</span>
+              </div>
+              <div class="summary-line">
+                <span>Taxa de Entrega</span>
+                <span id="taxaEntrega">R$ 5,00</span>
+              </div>
+              <div class="summary-line total-line">
+                <strong>Total Geral</strong>
+                <strong id="totalPedido">R$ 0,00</strong>
+              </div>
+            </div>
+
+            <!-- Formulário de Entrega e Pagamento -->
+            <form id="formCheckout" class="checkout-form">
+              <fieldset class="form-group">
+                <legend class="form-legend">Dados para Entrega</legend>
+                <input type="text" id="nomeCliente" name="nomeCliente" class="input-field" placeholder="Nome Completo *" required>
+                <input type="tel" id="telefoneCliente" name="telefoneCliente" class="input-field" placeholder="WhatsApp: (14) 99881-2233 *" required>
+                <input type="text" id="enderecoCliente" name="enderecoCliente" class="input-field" placeholder="Rua, Número e Bairro *" required>
+                <input type="text" id="referenciaEntrega" name="referenciaEntrega" class="input-field" placeholder="Ponto de Referência ou Apartamento">
+              </fieldset>
+
+              <fieldset class="form-group">
+                <legend class="form-legend">Forma de Pagamento</legend>
+                <div class="payment-options">
+                  <label class="radio-card">
+                    <input type="radio" name="tipoPagamento" value="pix" checked>
+                    <span class="radio-content">⚡ Pix Imediato</span>
+                  </label>
+                  <label class="radio-card">
+                    <input type="radio" name="tipoPagamento" value="cartao">
+                    <span class="radio-content">💳 Cartão na Entrega</span>
+                  </label>
+                  <label class="radio-card">
+                    <input type="radio" name="tipoPagamento" value="dinheiro">
+                    <span class="radio-content">💵 Dinheiro</span>
+                  </label>
+                </div>
+                
+                <!-- Condicional Dinheiro / Troco -->
+                <div id="trocoContainer" class="troco-wrapper hidden">
+                  <input type="text" id="valorTroco" class="input-field" placeholder="Precisa de troco para quanto? (Ex: R$ 50,00)">
+                </div>
+              </fieldset>
+
+              <button id="btnFinalizarPedido" type="submit" class="btn-cta-submit" disabled>
+                <span>Confirmar e Enviar Pedido</span>
+                <span class="icon-arrow">➔</span>
+              </button>
+            </form>
+          </section>
+        </aside>
+
+      </div>
+    </section>
+
+    <!-- ==================== 2. VISÃO DA COZINHA (KDS) ==================== -->
+    <section id="visaoCozinha" class="view-section hidden">
+      <header class="kds-header">
+        <div>
+          <h2>👨‍🍳 Painel de Comandas da Cozinha (KDS)</h2>
+          <p class="subtitle">Sincronização em tempo real via Cloud Firestore com a chapa de preparação.</p>
+        </div>
+        <div class="kds-filter">
+          <span class="pulse-indicator"></span> <strong>Transmissão Realtime Ativa</strong>
+        </div>
+      </header>
+
+      <!-- Grid de Pedidos Recebidos -->
+      <div id="listaPedidos" class="kds-grid">
+        <!-- Cards de Comandas renderizados em tempo real -->
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ==================== MODAL DE CUSTOMIZAÇÃO DE LANCHE ==================== -->
+  <div id="modalCustomizacao" class="modal-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="modalTituloLanche">
+    <div class="modal-container">
+      
+      <header class="modal-header">
+        <img id="modalImgLanche" src="" alt="Lanche" class="modal-header-img">
+        <button id="btnCloseModal" class="btn-close-modal" type="button" aria-label="Fechar modal">✕</button>
+      </header>
+
+      <div class="modal-body">
+        <span id="modalBadgeLanche" class="badge-city" style="display: inline-block; margin-bottom: 0.5rem;">Personalize seu Burguer</span>
+        <h3 id="modalTituloLanche" class="modal-product-title">Nome do Lanche</h3>
+        <p id="modalDescLanche" class="modal-product-desc">Descrição detalhada com os ingredientes.</p>
+
+        <!-- Seção: Ponto da Carne -->
+        <section id="secPontoCarne" class="custom-section">
+          <div class="custom-section-title">
+            <span>🥩 1. Ponto da Carne</span>
+            <span class="tag-required">Obrigatório</span>
+          </div>
+          <div class="radio-group-vertical">
+            <label class="radio-card">
+              <input type="radio" name="pontoCarne" value="Ao Ponto (Mais Suculento)" checked>
+              <span>Ao Ponto (Centro rosado e muito suculento)</span>
+            </label>
+            <label class="radio-card">
+              <input type="radio" name="pontoCarne" value="Bem Passado">
+              <span>Bem Passado (Mais tostado na chapa)</span>
+            </label>
+            <label class="radio-card">
+              <input type="radio" name="pontoCarne" value="Ponto Menos (Mais Vermelho)">
+              <span>Ao Ponto para Menos (Super macio)</span>
+            </label>
+          </div>
+        </section>
+
+        <!-- Seção: Adicionais Artesanais -->
+        <section class="custom-section">
+          <div class="custom-section-title">
+            <span>🔥 2. Turbine seu Hambúrguer - Adicionais</span>
+            <span class="tag-optional">Opcional</span>
+          </div>
+          <div id="listaAdicionaisModal" class="addons-list">
+            <!-- Adicionais renderizados dinamicamente -->
+          </div>
+        </section>
+
+        <!-- Seção: Remoções de Ingredientes -->
+        <section class="custom-section">
+          <div class="custom-section-title">
+            <span>🚫 3. Remover Ingredientes</span>
+            <span class="tag-optional">Sem custo</span>
+          </div>
+          <div class="removals-grid">
+            <label class="removal-chip">
+              <input type="checkbox" name="removerIngrediente" value="Sem Picles">
+              <span>Sem Picles</span>
+            </label>
+            <label class="removal-chip">
+              <input type="checkbox" name="removerIngrediente" value="Sem Cebola">
+              <span>Sem Cebola</span>
+            </label>
+            <label class="removal-chip">
+              <input type="checkbox" name="removerIngrediente" value="Sem Molho Especial">
+              <span>Sem Molho</span>
+            </label>
+            <label class="removal-chip">
+              <input type="checkbox" name="removerIngrediente" value="Sem Bacon">
+              <span>Sem Bacon</span>
+            </label>
+          </div>
+        </section>
+
+        <!-- Seção: Observações Especiais -->
+        <section class="custom-section">
+          <div class="custom-section-title">
+            <span>✍️ 4. Observações Especiais</span>
+            <span class="tag-optional">Instruções para a cozinha</span>
+          </div>
+          <textarea id="modalObsTexto" class="custom-notes-area" maxlength="140" placeholder="Ex: Molho à parte, cortar ao meio, caprichar no guardanapo..."></textarea>
+          <div class="notes-counter-row">
+            <span id="modalNotasCharCount">0/140</span>
+          </div>
+        </section>
+
+      </div>
+
+      <!-- Rodapé do Modal -->
+      <footer class="modal-footer">
+        <div class="modal-qty-box">
+          <button id="btnDecModal" class="btn-modal-qty" type="button" aria-label="Diminuir quantidade">-</button>
+          <span id="modalQtdLanche" class="modal-qty-val">1</span>
+          <button id="btnIncModal" class="btn-modal-qty" type="button" aria-label="Aumentar quantidade">+</button>
+        </div>
+        <button id="btnConfirmModal" class="btn-modal-confirm" type="button">
+          <span>Adicionar ao Pedido</span>
+          <strong id="modalPrecoTotalBtn">R$ 28,00</strong>
+        </button>
+      </footer>
+
+    </div>
+  </div>
+
+  <!-- ==================== MODAL DE CONFIRMAÇÃO PIX ==================== -->
+  <div id="modalPixSucesso" class="modal-overlay hidden" role="dialog" aria-modal="true">
+    <div class="modal-container" style="max-width: 480px;">
+      <div class="success-modal-content">
+        <div class="success-icon">⚡</div>
+        <h3 style="font-size: 1.4rem; font-weight: 800; margin-bottom: 0.4rem;">Pedido Enviado para a Cozinha!</h3>
+        <p style="color: var(--text-secondary); font-size: 0.9rem;">
+          Pedido <strong id="pixNumPedido" style="color: var(--accent-neon);">#000</strong> registrado. Realize o pagamento Pix no valor de <strong id="pixValorTotal" style="color: var(--accent-green);">R$ 0,00</strong> para liberação do motoboy.
+        </p>
+
+        <div class="pix-box">
+          <span style="font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--accent-green); font-weight: 700;">Chave Pix Copia e Cola (CNPJ / E-mail)</span>
+          <span id="pixChaveValor" class="pix-key-text">pix@burguersync-ourinhos.com.br</span>
+          <button id="btnCopyPix" class="btn-copy-pix" type="button">📋 Copiar Chave Pix</button>
+        </div>
+
+        <button id="btnClosePixModal" class="btn-cta-submit" type="button" style="margin-top: 1rem;">
+          <span>Acompanhar na Cozinha (KDS) ➔</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== NOTIFICAÇÃO TOAST ==================== -->
+  <aside id="toastNotification" class="toast-container hidden" role="status" aria-live="polite">
+    <span class="toast-icon">✅</span>
+    <span id="toastMessage" class="toast-text">Pedido enviado com sucesso para a cozinha!</span>
+  </aside>
+
+  <!-- Módulos JavaScript (ES6 ESM) -->
+  <script type="module" src="./js/app.js"></script>
+
+</body>
+</html>

@@ -1,0 +1,29 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // Regras para a coleção de pedidos do BurguerSync
+    match /pedidos/{pedidoId} {
+      // Permite leitura em tempo real para o KDS e clientes
+      allow read: if true;
+      
+      // Permite criação de pedidos se contiver os campos obrigatórios
+      allow create: if request.resource.data.cliente.nome != null
+                    && request.resource.data.cliente.celular != null
+                    && request.resource.data.cliente.endereco != null
+                    && request.resource.data.itens.size() > 0
+                    && request.resource.data.status in ['Recebido', 'recebido'];
+      
+      // Permite atualização de status pelo painel da cozinha (KDS)
+      allow update: if request.resource.data.status in [
+        'Recebido', 'recebido', 
+        'Em Preparo', 'preparo', 
+        'Saiu para Entrega', 'entrega', 
+        'Entregue', 'concluido'
+      ];
+      
+      // Bloqueia deleção arbitrária para auditoria
+      allow delete: if false;
+    }
+  }
+}
