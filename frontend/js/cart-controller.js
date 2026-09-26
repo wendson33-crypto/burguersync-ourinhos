@@ -31,7 +31,7 @@ export const PRODUTOS = [
     descricao: "Sobrecoxa empanada super crocante, salada coleslaw cremosa da casa, picles e maionese verde de ervas.",
     preco: 29.90,
     badge: "Crocante",
-    imagem: "https://lh3.googleusercontent.com/aida/AEtjO1X7ixdieTmcrmAq0aZJgkUo4BzJ7ckxXC7u_8PHR2eRKrOLL_iD2IFaFhfk_JYlV9cOzMeOYRWwJmjTC7gNrhFBzWq0gAmeZEEX6WejLTyC7s6qlqk6Gcf51D56F4TM6ty5kDVL2EpVCH3rSzqNKkOnfqAsn2-7-iXR_JRmcBBkIUidVJ5X0xnQyyVWPStEQGw_KzEE8raVQ84a5I0j6w4gz-yv6ofhTI_u9GYjiMkkg_AmbukTmTM1w"
+    imagem: "https://lh3.googleusercontent.com/aida/AEtjO1Xl-Ybex0rVTOsZDtZCZN-jUiZR7BtZq7hTG-YaZYTE27Bu5mCNWHMSfmmqcTqOZGGU3I9aKp5OZTJNY-BbaFHcqHLameo0x1JsAODl2yFYwOtu729rGiBRYV5H0yyIOMpn6Yel7QJSwZ2ItWkgYkKy5Vv2iX51evuCnBzbvZvFV2d2Fed2X7Id3ouwgEyrhQGz4KdLTzI5nFLp0S1DL_8SleIeRt3vXWQHJCGSFpn9BTS1IObJP5jryg"
   },
   {
     id: 4,
@@ -120,6 +120,9 @@ export class CartController {
     if (imgEl) {
       imgEl.src = produto.imagem;
       imgEl.alt = produto.nome;
+      imgEl.onerror = () => {
+        imgEl.src = 'https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=600&auto=format&fit=crop&q=60';
+      };
     }
     if (titEl) titEl.textContent = produto.nome;
     if (descEl) descEl.textContent = produto.descricao;

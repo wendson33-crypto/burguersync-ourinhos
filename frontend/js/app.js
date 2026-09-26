@@ -65,7 +65,7 @@ export function renderizarCatalogo(filtro = 'todos') {
 
     card.innerHTML = `
       <div class="product-image-container">
-        <img src="${prod.imagem}" alt="${prod.nome}" class="product-image" loading="lazy">
+        <img src="${prod.imagem}" alt="${prod.nome}" class="product-image" loading="lazy" onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=600&auto=format&fit=crop&q=60';">
         <span class="badge-tag">${prod.badge}</span>
       </div>
       <div class="product-info">
